@@ -34,7 +34,7 @@ services:
       - mailhog
       - sidekiq
     ports:
-      - 3000:3000
+      - 7000:3000
     env_file: .env
     environment:
       - VITE_DEV_SERVER_HOST=vite
