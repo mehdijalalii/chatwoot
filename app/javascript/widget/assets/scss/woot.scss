@@ -3,11 +3,13 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 @import 'shared/assets/fonts/widget_fonts';
+@import 'shared/assets/fonts/iransans';
 @import 'views/conversation';
 
 html,
 body {
   @apply antialiased h-full;
+  font-family: 'IRANSans', 'Inter', -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Tahoma, Arial, sans-serif;
 }
 
 .is-mobile {
@@ -378,5 +380,39 @@ blockquote {
     --border-blue: 39, 129, 246, 0.5;
     --border-container: 236, 236, 236, 0;
     --white-alpha: 255, 255, 255, 0.1;
+  }
+}
+
+// ۱. زدن ریشه المان‌های اضافه در هدر و جزییات مقالات ویجت
+div[class*="widget-article"],
+.widget-article-list-header,
+.article-list-header {
+  h2, span, p, div {
+    display: none !important;
+  }
+}
+
+// ۲. مخفی کردن متادیتای مقالات (تعداد مقاله، نام نویسنده و تاریخ)
+.article-item {
+  span[class*="meta"],
+  .article-meta,
+  div[class*="count"] {
+    display: none !important;
+  }
+}
+
+// ۳. مخفی کردن دسته‌بندی و تعداد در کل کامپوننت مرکز راهنمای ویجت
+.help-center-portal {
+  .category-title,
+  .category-item-count,
+  .article-count {
+    display: none !important;
+  }
+}
+
+// ۴. تزریق و اجبار فونت ایران‌سنس به تمام اجزای متنی عمیق ویجت
+html, body, #app, .help-center-portal, .article-container {
+  &, *, h1, h2, h3, h4, h5, h6, p, span, a, div {
+    font-family: 'IRANSans', system-ui, -apple-system, sans-serif !important;
   }
 }
