@@ -63,4 +63,24 @@ debug_worker:
 docker: 
 	docker build -t $(APP_NAME) -f ./docker/Dockerfile .
 
-.PHONY: setup db_create db_migrate db_seed db_reset db console server burn docker run force_run force_run_tunnel debug debug_worker
+backup: ## Dump current database to backups/
+	@mkdir -p backups
+	@pg_dump -U mehdi -d chatwoot_dev > backups/chatwoot.sql
+	@echo "Backup saved to backups/chatwoot.sql"
+
+deploy: ## Start Docker and auto-restore backup if DB is empty
+	docker compose up -d
+	@echo "Waiting for PostgreSQL..."
+	@until docker compose exec postgres pg_isready -q -U postgres 2>/dev/null; do sleep 1; done
+	@echo "PostgreSQL is ready."
+	@TABLES=$$(docker compose exec postgres psql -U postgres -d chatwoot -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'" 2>/dev/null); \
+	if [ "$$TABLES" = "0" ] && [ -f backups/chatwoot.sql ]; then \
+		echo "Database is empty, restoring from backup..."; \
+		docker compose exec -T postgres psql -U postgres -d chatwoot < backups/chatwoot.sql; \
+		echo "Restore complete."; \
+	else \
+		echo "Database has $$TABLES tables, skipping restore."; \
+	fi
+	@echo "Deploy finished."
+
+.PHONY: setup db_create db_migrate db_seed db_reset db console server burn docker run force_run force_run_tunnel debug debug_worker backup deploy
